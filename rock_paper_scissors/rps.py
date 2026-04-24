@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import random
+import os
 
 # =============================
 # CONFIG
@@ -19,8 +20,20 @@ RIGHT_POS = (420, 140)
 
 CHOICES = ["rock", "paper", "scissors"]
 
-LEFT_IMAGES = ["rock.jpeg", "paper.jpeg", "scissors.jpeg"]
-RIGHT_IMAGES = ["rock_mirror.jpeg", "paper_mirror.jpeg", "scissors_mirror.jpeg"]
+# ✅ BASE DIRECTORY (important fix)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+LEFT_IMAGES = [
+    os.path.join(BASE_DIR, "assets/rock.jpeg"),
+    os.path.join(BASE_DIR, "assets/paper.jpeg"),
+    os.path.join(BASE_DIR, "assets/scissors.jpeg")
+]
+
+RIGHT_IMAGES = [
+    os.path.join(BASE_DIR, "assets/rock_mirror.jpeg"),
+    os.path.join(BASE_DIR, "assets/paper_mirror.jpeg"),
+    os.path.join(BASE_DIR, "assets/scissors_mirror.jpeg")
+]
 
 # =============================
 # INIT
@@ -42,11 +55,21 @@ canvas = tk.Canvas(
 canvas.pack(pady=2)
 
 # =============================
-# LOAD IMAGES
+# LOAD IMAGES (SAFE)
 # =============================
-left_imgs = [ImageTk.PhotoImage(Image.open(img).resize(TARGET_SIZE)) for img in LEFT_IMAGES]
-right_imgs = [ImageTk.PhotoImage(Image.open(img).resize(TARGET_SIZE)) for img in RIGHT_IMAGES]
-btn_imgs = [ImageTk.PhotoImage(Image.open(img).resize(BUTTON_SIZE)) for img in LEFT_IMAGES]
+def load_images(paths, size):
+    images = []
+    for path in paths:
+        try:
+            img = Image.open(path).resize(size)
+            images.append(ImageTk.PhotoImage(img))
+        except Exception as e:
+            print(f"Error loading {path}: {e}")
+    return images
+
+left_imgs = load_images(LEFT_IMAGES, TARGET_SIZE)
+right_imgs = load_images(RIGHT_IMAGES, TARGET_SIZE)
+btn_imgs = load_images(LEFT_IMAGES, BUTTON_SIZE)
 
 # =============================
 # UI ELEMENTS
